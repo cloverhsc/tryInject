@@ -12,7 +12,11 @@ export class HomeComponent implements OnInit {
   constructor(private pService: ParentService) {}
 
   ngOnInit(): void {
-    this.pService.passHello().then((data) => {
+    /* this.pService.passHello().then((data) => {
+      this.welcomeMessage = data;
+    }); */
+
+    this.pService.passHello().subscribe((data) => {
       this.welcomeMessage = data;
     });
   }

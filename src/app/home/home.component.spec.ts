@@ -1,7 +1,8 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { HomeComponent } from './home.component';
 import { ParentService } from '../service/parent.service';
+import { delay, of } from 'rxjs';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -10,7 +11,7 @@ describe('HomeComponent', () => {
 
   beforeEach(() => {
     const spyParentService = jasmine.createSpyObj('ParentService', ['passHello']);
-    spyParentService.passHello.and.returnValue(Promise.resolve('Hello from ChildService'));
+    spyParentService.passHello.and.returnValue(of('Hello from ChildService').pipe(delay(2000)));
     TestBed.configureTestingModule({
       declarations: [HomeComponent],
       providers: [
@@ -27,16 +28,26 @@ describe('HomeComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should show "welcome" message when child service returns "Hello Clover"', async () => {
+  it('should show "Hello Clover" message when child service returns "Hello Clover"', waitForAsync(() => {
     const welcomeMessage = 'Hello Clover';
     const compiled = fixture.nativeElement;
-    parentService.passHello = jasmine.createSpy().and.returnValue(Promise.resolve(welcomeMessage));
+    parentService.passHello = jasmine.createSpy().and.returnValue(of(welcomeMessage).pipe(delay(2000)));
 
-    await component.ngOnInit();
-    fixture.detectChanges();
-    console.log(compiled.querySelector('h3'));
-    expect(compiled.querySelector('h3').textContent).toContain(welcomeMessage);
+    component.ngOnInit();
+    expect(parentService.passHello).toHaveBeenCalled()
+    setTimeout(() => {
+      fixture.detectChanges();
+      fixture.whenStable();
+      console.log(compiled.querySelector('h3'));
+      console.log(component.welcomeMessage);
+      expect(compiled.querySelector('h3').textContent).toContain(welcomeMessage);
+    }, 2000)
+    // fixture.detectChanges();
+    // fixture.whenStable();
+    // console.log(component.welcomeMessage);
+    // console.log(compiled.querySelector('h3'));
+    // expect(compiled.querySelector('h3').textContent).toContain(welcomeMessage);
 
 
-  });
+  }));
 });

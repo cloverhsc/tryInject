@@ -1,6 +1,6 @@
 import { Injectable, OnInit } from '@angular/core';
 import { ChildService } from './child.service';
-import { lastValueFrom } from 'rxjs';
+import { Observable, lastValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +15,7 @@ export class ParentService implements OnInit {
     });
   }
 
-  async passHello(): Promise<string> {
+  /* async passHello(): Promise<string> {
     let message = '';
     this.childService.sendHello().subscribe((data) => {
       console.info('data', data);
@@ -27,5 +27,8 @@ export class ParentService implements OnInit {
     // assign the value of res1 to message
     message = res1;
     return message;
+  } */
+  passHello(): Observable<string> {
+    return this.childService.sendHello();
   }
 }
